@@ -8,6 +8,7 @@ import fracty from 'fracty';
 
 class RecipeView extends View {
   _parentElement = document.querySelector('.recipe');
+  navEl = document.querySelector('.nav');
   _errorMessage = 'We could not find the recipe, please try another one!';
   _message = '';
 
@@ -25,10 +26,25 @@ class RecipeView extends View {
     });
   }
 
-  _generateMarkup() {
-    const curServings = this._data.servings;
-    console.log(curServings);
+  addHandlerAddBookmarks(handler) {
+    // this.navEl.addEventListener('click', e => {
+    //   const bookmark = e.target.closet('.bookmarks__list');
+    //   if (!bookmark) return;
+    //   const text = this.navEl.querySelector('p');
+    // });
 
+    this._parentElement.addEventListener('click', e => {
+      const bookmarkBtn = e.target.closest('.btn--bookmark');
+      if (!bookmarkBtn) return;
+
+      // const link = bookmarkBtn.querySelector('use');
+      // link.setAttribute('href', `${icons}#icon-bookmark-fill`);
+
+      handler();
+    });
+  }
+
+  _generateMarkup() {
     return `<figure class="recipe__fig">
                 <img src="${this._data.image}" alt="${
       this._data.title
@@ -77,9 +93,11 @@ class RecipeView extends View {
 
                 <div class="recipe__user-generated">
                 </div>
-                <button class="btn--round">
+                <button class="btn--round btn--bookmark">
                     <svg class="">
-                    <use href="${icons}#icon-bookmark-fill"></use>
+                    <use href="${icons}#icon-bookmark${
+      this._data.bookmarked ? '-fill' : ''
+    }"></use>
                     </svg>
                 </button>
                 </div>
@@ -132,3 +150,5 @@ class RecipeView extends View {
 }
 
 export default new RecipeView();
+
+//add handler to recipe so that user can bookmark the recipe / rerender or update the recipe with the bookmork button is updated

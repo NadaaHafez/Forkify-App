@@ -19,13 +19,15 @@ const controlRecipes = async function () {
 
     recipeView.renderSpinner();
 
-    //loading recipe
+    //0) Update results view to mark the selected search results
+    resultsView.update(model.getSearchResultsPage());
+
+    //1) loading recipe
     await model.loadRecipe(id); // because loadRecipe() will return a promise so we need to await it (it's similar to async func calling another async func)
 
-    //rendering recipe
+    //2) rendering recipe
     recipeView.render(model.state.recipe);
   } catch (err) {
-    // alert(err);
     recipeView.renderError();
   }
 };
@@ -38,6 +40,8 @@ const controlSearchResults = async function () {
 
     //render spinner
     resultsView.renderSpinner();
+
+    // const page = model.state.search.query !== query ? 1 : undefined;
 
     //load Search Results
     await model.loadSearchResults(query);
@@ -65,7 +69,17 @@ const controlServings = function (servings) {
   model.updateServings(servings);
 
   //update the recipe views
-  recipeView.render(model.state.recipe);
+  // recipeView.render(model.state.recipe);
+  recipeView.update(model.state.recipe);
+};
+
+const controlAddBookmarks = function () {
+  model.init();
+  //update the bookmark
+  model.addBookmark(model.state.recipe);
+  console.log(model.state.bookmarks);
+
+  //update the recipe view
   recipeView.update(model.state.recipe);
 };
 
@@ -74,6 +88,8 @@ const init = function () {
   searchView.addHandlerSearch(controlSearchResults);
   paginationView.addHandlerPagination(controlPagination);
   recipeView.addHandlerUpdateServings(controlServings);
+
+  recipeView.addHandlerAddBookmarks(controlAddBookmarks);
 };
 
 init();
