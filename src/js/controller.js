@@ -3,6 +3,7 @@ import recipeView from './views/recipeView.js'; // we're only importing the inst
 import searchView from './views/searchView.js'; // we're only importing the instances of the class
 import resultsView from './views/resultsView.js'; // we're only importing the instances of the class
 import paginationView from './views/paginationView.js';
+import bookmarkView from './views/bookmarkView.js';
 
 import 'core-js/stable'; //polyfill everything else
 import 'regenerator-runtime/runtime'; //for polyfill async/await
@@ -22,10 +23,13 @@ const controlRecipes = async function () {
     //0) Update results view to mark the selected search results
     resultsView.update(model.getSearchResultsPage());
 
-    //1) loading recipe
+    //1) update bookmarks
+    bookmarkView.update(model.state.bookmarks);
+
+    //2) loading recipe
     await model.loadRecipe(id); // because loadRecipe() will return a promise so we need to await it (it's similar to async func calling another async func)
 
-    //2) rendering recipe
+    //3) rendering recipe
     recipeView.render(model.state.recipe);
   } catch (err) {
     recipeView.renderError();
@@ -74,21 +78,27 @@ const controlServings = function (servings) {
 };
 
 const controlAddBookmarks = function () {
-  model.init();
-  //update the bookmark
-  model.addBookmark(model.state.recipe);
-  console.log(model.state.bookmarks);
+  //1) Add/Remove bookmark
+  if (!model.state.recipe.bookmarked) model.addBookmark(model.state.recipe);
+  else model.deleteBookmark(model.state.recipe.id);
 
-  //update the recipe view
+  //2) Update Recipe view
   recipeView.update(model.state.recipe);
+
+  //3)Render bookmarks
+  bookmarkView.render(model.state.bookmarks);
+};
+
+const controlBookmark = function () {
+  bookmarkView.render(model.state.bookmarks);
 };
 
 const init = function () {
+  bookmarkView.addhandlerRender(controlBookmark);
   recipeView.addHandlerRender(controlRecipes);
   searchView.addHandlerSearch(controlSearchResults);
   paginationView.addHandlerPagination(controlPagination);
   recipeView.addHandlerUpdateServings(controlServings);
-
   recipeView.addHandlerAddBookmarks(controlAddBookmarks);
 };
 

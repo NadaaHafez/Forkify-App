@@ -8,7 +8,6 @@ import fracty from 'fracty';
 
 class RecipeView extends View {
   _parentElement = document.querySelector('.recipe');
-  navEl = document.querySelector('.nav');
   _errorMessage = 'We could not find the recipe, please try another one!';
   _message = '';
 
@@ -27,18 +26,9 @@ class RecipeView extends View {
   }
 
   addHandlerAddBookmarks(handler) {
-    // this.navEl.addEventListener('click', e => {
-    //   const bookmark = e.target.closet('.bookmarks__list');
-    //   if (!bookmark) return;
-    //   const text = this.navEl.querySelector('p');
-    // });
-
     this._parentElement.addEventListener('click', e => {
       const bookmarkBtn = e.target.closest('.btn--bookmark');
       if (!bookmarkBtn) return;
-
-      // const link = bookmarkBtn.querySelector('use');
-      // link.setAttribute('href', `${icons}#icon-bookmark-fill`);
 
       handler();
     });

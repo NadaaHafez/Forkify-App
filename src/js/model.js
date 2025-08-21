@@ -26,9 +26,12 @@ export const loadRecipe = async function (id) {
       servings: recipe.servings,
       cookingTime: recipe.cooking_time,
       id: recipe.id,
+      bookmarked: false,
     };
 
-    console.log(state.recipe);
+    // mark if bookmarked
+    if (state.bookmarks.some(b => b.id === id)) state.recipe.bookmarked = true;
+    else state.recipe.bookmarked = false;
   } catch (err) {
     throw err;
   }
@@ -88,21 +91,43 @@ export const updateServings = function (servings) {
 //   state.recipe.servings = servings;
 // };
 
-// Initialize bookmarks from localStorage
-export const init = function () {
-  const storage = localStorage.getItem('bookmarks');
-  if (storage) state.bookmarks = JSON.parse(storage);
+const persistBookmarks = function () {
+  const storage = localStorage.setItem(
+    'bookmarks',
+    JSON.stringify(state.bookmarks)
+  );
+
+  return storage;
 };
 
-//will recieve a recipe and set it as a bookmark
 export const addBookmark = function (recipe) {
-  if (!state.bookmarks.some(b => b.id === recipe.id)) {
-    //localStorage
-    state.bookmarks.push(recipe);
-    localStorage.setItem('bookmarks', JSON.stringify(state.bookmarks));
-  }
+  state.bookmarks.push(recipe);
 
   if (recipe.id === state.recipe.id) state.recipe.bookmarked = true;
 
-  localStorage.getItem('bookmarks');
+  persistBookmarks();
 };
+
+export const deleteBookmark = function (id) {
+  const index = state.bookmarks.findIndex(el => el.id === id);
+  state.bookmarks.slice(index, 1);
+
+  if (id === state.recipe.id) state.recipe.bookmarked = false;
+
+  persistBookmarks();
+};
+
+const init = function () {
+  const storage = JSON.parse(localStorage.getItem('bookmarks'));
+  if (storage) state.bookmarks = storage;
+};
+
+init();
+
+const clearBookmark = function () {
+  localStorage.clear('bookmarks');
+};
+
+// clearBookmark();
+
+//recipe editor for the user to upload his own recipes
