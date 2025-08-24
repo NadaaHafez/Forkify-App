@@ -1,9 +1,12 @@
 import * as model from './model.js';
+import { MODEL_CLOSE_SEC } from './config.js';
+
 import recipeView from './views/recipeView.js'; // we're only importing the instances of the class
 import searchView from './views/searchView.js'; // we're only importing the instances of the class
 import resultsView from './views/resultsView.js'; // we're only importing the instances of the class
 import paginationView from './views/paginationView.js';
 import bookmarkView from './views/bookmarkView.js';
+import addRecipeView from './views/addRecipeView.js';
 
 import 'core-js/stable'; //polyfill everything else
 import 'regenerator-runtime/runtime'; //for polyfill async/await
@@ -90,7 +93,39 @@ const controlAddBookmarks = function () {
 };
 
 const controlBookmark = function () {
+  //Render bookmaks as soon as the page loads
   bookmarkView.render(model.state.bookmarks);
+};
+
+const controlAddRecipe = async function (newRecipe) {
+  try {
+    //render spinner
+    addRecipeView.renderSpinner();
+
+    //upload the new Recipe data
+    await model.uploadRecipe(newRecipe);
+    console.log(model.state.recipe);
+
+    //render the uploaded recipe
+    recipeView.render(model.state.recipe);
+
+    //success message
+    addRecipeView.renderMessage();
+
+    //close form window
+    setTimeout(() => {
+      addRecipeView.toggleWindow();
+    }, MODEL_CLOSE_SEC * 1000);
+
+    //)Render bookmarks
+    bookmarkView.render(model.state.bookmarks);
+
+    //change ID in the URL
+    window.history.pushState(null, '', `#${model.state.recipe.id}`);
+  } catch (err) {
+    console.error(err);
+    addRecipeView.renderError(err.message);
+  }
 };
 
 const init = function () {
@@ -100,6 +135,7 @@ const init = function () {
   paginationView.addHandlerPagination(controlPagination);
   recipeView.addHandlerUpdateServings(controlServings);
   recipeView.addHandlerAddBookmarks(controlAddBookmarks);
+  addRecipeView.addHandlerUpload(controlAddRecipe);
 };
 
 init();

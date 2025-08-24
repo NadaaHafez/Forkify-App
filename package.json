@@ -12,7 +12,8 @@
     "core-js": "^3.45.0",
     "fracty": "^1.0.12",
     "parcel": "^2.15.4",
-    "regenerator-runtime": "^0.14.1"
+    "regenerator-runtime": "^0.14.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.15.4"
